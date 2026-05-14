@@ -46,7 +46,7 @@ async function registerUserController(req, res) {
         )
 
         //This part is used to set the token in the cookie
-        res.cookie("Token", token)
+        res.cookie("token", token)
         
         res.status(201).json({
             message: "User registered successfully",
@@ -94,30 +94,41 @@ async function loginUserController(req, res) {
     }, process.env.JWT_SECRET,
         { expiresIn: '1d' });
     
-    res.cookie("Token", token);
+    res.cookie("token", token);
     res.status(200).json({
         message: "User logged in successfully",
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email
-        }
     })
 }
 
 //This controller is used to logout the user by clearing the token from the cookie.
 async function logoutUserController(req, res) {
-    const token = req.cookies.Token;
+    const token = req.cookies.token;
 
     if (token) {
         await tokenBlacklistModel.create({
             token
         })
     }
-    res.clearCookie("Token");
+    res.clearCookie("token");
     res.status(200).json({
         message: "User logged out successfully"
     })
 }
 
-module.exports={registerUserController, loginUserController, logoutUserController}
+
+async function getMeController(req, res) { 
+    const user = await userModel.findById(req.user.id);
+    res.status(200).json({
+        message: "User details fetched successfully",
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        }})
+}
+module.exports = {
+    registerUserController,
+    loginUserController,
+    logoutUserController,
+    getMeController
+}
