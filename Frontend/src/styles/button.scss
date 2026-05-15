@@ -1,0 +1,13 @@
+.button{
+    border: none;
+    outline: none;
+    padding-inline: 1.5rem;
+    padding-block: 0.75rem;
+    border-radius: 1rem;
+    cursor: pointer;
+
+    &.primary-button{
+        background-color: rgb(223, 21, 78);
+        color: white;
+    }
+}
