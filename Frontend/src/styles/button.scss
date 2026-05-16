@@ -6,8 +6,14 @@
     border-radius: 1rem;
     cursor: pointer;
 
+    transition:all 0.3s ease-in-out;
+
     &.primary-button{
         background-color: rgb(223, 21, 78);
         color: white;
+    }
+
+    &:active{
+        transform: scale(1.1);
     }
 }
