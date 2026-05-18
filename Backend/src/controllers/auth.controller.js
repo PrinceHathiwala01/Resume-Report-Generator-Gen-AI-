@@ -115,7 +115,7 @@ async function logoutUserController(req, res) {
     })
 }
 
-
+//This controller is used to get the details of the user who is logged in
 async function getMeController(req, res) { 
     const user = await userModel.findById(req.user.id);
     res.status(200).json({

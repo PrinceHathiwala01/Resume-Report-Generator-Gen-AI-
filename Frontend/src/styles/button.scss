@@ -9,8 +9,12 @@
     transition:all 0.3s ease-in-out;
 
     &.primary-button{
-        background-color: rgb(223, 21, 78);
-        color: white;
+        background-color: #8B5CF6;
+        color: #F8FAFC;
+
+        &:hover{
+            background-color: #7C3AED;
+        }
     }
 
     &:active{
