@@ -6,13 +6,16 @@ import { useAuth } from '../hooks/useAuth'
 const Login = () => {
 
     const { loading, handelLogin } = useAuth();
+
+    const navigate = useNavigate();
     
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const handelSubmit = async (e) => {
         e.preventDefault();
-        handelLogin({ email, password });
+        await handelLogin({ email, password });
+        navigate("/");
     }
 
     if (loading) {
