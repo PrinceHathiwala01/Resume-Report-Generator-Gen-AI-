@@ -12,12 +12,13 @@ const api = axios.create({
 //This api caller is used to register the user via frontend of the website
 export async function register({ username, email, password }) {
     try {
-        const response = await api.post("/api/auth/regiter", {
+        const response = await api.post("/api/auth/register", {
             username,email,password
         })
         return response.data
     } catch (err) {
         console.log("Error in registering the user:", err);
+        throw err;
     }
 }
 
@@ -30,6 +31,7 @@ export async function login({email,password}) {
         return response.data
     } catch (err) {
         console.log("Error in logging in the user:", err);
+        throw err;
     }
 }
 
@@ -41,6 +43,7 @@ export async function logout() {
     } catch (err)
     {
         console.log("Unable to logout the user:", err);
+        throw err;
     }
 }
 
@@ -50,6 +53,11 @@ export async function getMe() {
         const response = await api.get("/api/auth/get-me")
         return response.data
     } catch (err) {
+        if (err.response?.status === 401) {
+            return { user: null };
+        }
+
         console.log("Unable to get the user details:", err);
+        throw err;
     }
 }

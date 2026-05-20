@@ -27,4 +27,27 @@ async function authUser(req, res, next) {
     }    
 }
 
-module.exports = {authUser};
+async function optionalAuthUser(req, res, next) {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return next();
+    }
+
+    const isTokenBlacklisted = await tokenBlacklistModel.findOne({ token });
+    if (isTokenBlacklisted) {
+        res.clearCookie("token");
+        return next();
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = decoded;
+    } catch {
+        res.clearCookie("token");
+    }
+
+    next();
+}
+
+module.exports = {authUser, optionalAuthUser};

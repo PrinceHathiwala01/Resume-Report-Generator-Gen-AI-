@@ -1,4 +1,4 @@
-import React,{ useState } from 'react'
+import { useState } from 'react'
 import "../auth.form.scss"
 import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
@@ -17,8 +17,11 @@ const Register = () => {
   //This is used to remove to the inicial reload of the page on button
   const handelSubmit = async (e) => {
       e.preventDefault();
-      await handelRegister({ username, email, password });
-      navigate("/");
+      const user = await handelRegister({ username, email, password });
+
+      if (user) {
+        navigate("/");
+      }
     }
     
     if (loading) {
