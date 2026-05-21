@@ -14,3 +14,6 @@ async function invokeGeminiAi() {
 }
 
 module.exports = invokeGeminiAi;
+
+//Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai
+//Content is the question that you want to ask
