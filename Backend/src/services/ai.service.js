@@ -8,30 +8,46 @@ const ai = new GoogleGenAI({
 });
 
 const interviewReportSchema = z.object({
+    matchScore: z.number().describe("The match score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
     technicalQuestions: z.array(z.object({
-        question: z.string().description("Technical question can be asked in interview"),
-        intention: z.string().description("The intention of interviewer behind asking this question"),
-        answer: z.string().description("How to answer this question, what points to cover, what approach to take etc.")
-    })).description("Technical question that can be asked in interview along with there intention and how to answer it"),
+        question: z.string().describe("Technical question can be asked in interview"),
+        intention: z.string().describe("The intention of interviewer behind asking this question"),
+        answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
+    })).describe("Technical question that can be asked in interview along with there intention and how to answer it"),
     behaviourQuestions: z.array(z.object({
-        question: z.string().description("Behaviour question can be asked in interview"),
-        intention: z.string().description("The intention of interviewer behind asking this question"),
-        answer: z.string().description("How to answer this question, what points to cover, what approach to take etc.")
-    })).description("Behaviour question that can be asked in interview along with there intention and how to answer it"),
+        question: z.string().describe("Behaviour question can be asked in interview"),
+        intention: z.string().describe("The intention of interviewer behind asking this question"),
+        answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
+    })).describe("Behaviour question that can be asked in interview along with there intention and how to answer it"),
     skillGaps:z.array(z.object({
-        skill: z.string().description("Skill gap can be asked in interview"),
-        severity:z.enum(["low", "medium", "high"]).description("The severity of skill gap"),
-    })).description("Skill gap that can be asked in interview along with there intention and how to answer it"),
+        skill: z.string().describe("Skill gap can be asked in interview"),
+        severity:z.enum(["low", "medium", "high"]).describe("The severity of skill gap"),
+    })).describe("List of skill gaps in the cadidate's profile along with their severity"),
     preparationPlan: z.array(z.object({
-        day: z.number().description("Day of the week"),
-        focus: z.string().description("Focus of the day"),
-        task: z.array(z.string()).description("Task to be done")
-    })),
+        day: z.number().describe("The day number in the preparation plan, starting from 1"),
+        focus: z.string().describe("The main focus of this day in the preparation plan, e.g. data structure"),
+        task: z.array(z.string()).describe("List of tasks to be completed in this day in the preparation plan, e.g. implement a binary search tree")
+    })).describe("A day-wise preparation plan for the candidate to prepare for the interview"),
 })
 async function genrateInterviewReport({ resume, jobDescription, selfDescription }) {
-    
+
+    const prompt = `Generate an interview report for a candidate with the following details:
+    Resume: ${resume}
+    Job describe: ${jobDescription}
+    Self describe: ${selfDescription}`
+
+    const response =await ai.models.generateContent({
+        model: "gemini-2.5-flash-lite",
+        contents:prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseJsonSchema: zodToJsonSchema(interviewReportSchema)
+        }
+    })
+
+    console.log(JSON.parse(response.text))
 }
-module.exports = invokeGeminiAi;
+module.exports = genrateInterviewReport;
 
 //Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai
 //Content is the question that you want to ask
