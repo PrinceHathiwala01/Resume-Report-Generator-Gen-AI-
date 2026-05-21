@@ -6,11 +6,21 @@ const ai = new GoogleGenAI({
 });
 
 async function invokeGeminiAi() {
+    try {
         const response = await ai.models.generateContent({
-            model:"gemini-2.5-flash",
-            contents:"Hello gemini! Explain what is interview?"
+            model: "gemini-2.5-flash",
+            contents: "Hello gemini! Explain what is interview?"
         })
         console.log(response.text);
+    }catch (error) {
+        console.log("Error in invoking gemini ai");
+
+        if (error.status === 429) {
+            console.log("Rate limit exceeded. Try again later.");
+        }
+
+        throw error;
+    }
 }
 
 module.exports = invokeGeminiAi;
