@@ -50,7 +50,7 @@ async function genrateInterviewReport({ resume, jobDescription, selfDescription 
 module.exports = genrateInterviewReport;
 
 //Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai
-//Content is the question that you want to ask
+//Content is the question that you want to ask to the AI inshort it is the prompt   
 
 /*
 If the error is raising that your quota has reached the limit then the free use of the ai is over you need to change it from the below link
