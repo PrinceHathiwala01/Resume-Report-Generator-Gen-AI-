@@ -7,6 +7,7 @@ const ai = new GoogleGenAI({
     apiKey:process.env.GOOGLE_GENAI_API_KEY
 });
 
+//DESCRIBE is the question that you want to ask to the AI or want to give the idea which filed you are talking about...
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("The match score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
     technicalQuestions: z.array(z.object({
