@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 //This is the sub schema for technicalQuestion section
-const technicalQuestionSchema = new mongosse.schema({
+const technicalQuestionSchema = new mongoose.Schema({
     question: {
         type: String,
         required: [true, "Technical question is required"]
@@ -19,7 +19,7 @@ const technicalQuestionSchema = new mongosse.schema({
 })
 
 //This is the sub schema for behaviourQuestion section
-const behaviourQuestionSchema = new mongoose.schema({
+const behaviourQuestionSchema = new mongoose.Schema({
     question: {
         type: String,
         required: [true, "Behaviour question is required"]
@@ -54,7 +54,7 @@ const skillGapSchema = new mongoose.Schema({
 //This is sub schema for preparation plan
 const preparationPlanSchema = new mongoose.Schema({
     day: {
-        type: number,
+        type: Number,
         required: [true, "Plan is required"]
     },
     focus: {
@@ -89,7 +89,11 @@ const interviewReportSchema = new mongoose.Schema({
     technicalQuestionSchema: [technicalQuestionSchema],
     behaviourQuestionSchema: [behaviourQuestionSchema],
     skillGapSchema: [skillGapSchema],
-    preparationPlanSchema: [preparationPlanSchema]
+    preparationPlanSchema: [preparationPlanSchema],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User_detail"
+    }
 });
 
 const interviewReportModel = mongoose.model("Interview_Report", interviewReportSchema);
