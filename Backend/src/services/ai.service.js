@@ -50,7 +50,7 @@ async function genrateInterviewReport({ resume, jobDescription, selfDescription 
 }
 module.exports = genrateInterviewReport;
 
-//Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai
+//Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai..
 //Content is the question that you want to ask to the AI inshort it is the prompt   
 
 /*
