@@ -72,5 +72,5 @@ gemini-2.5-flash-lite
 gemini-2.5
 
 If the error is raising that your API key is invalid and it is leaked then we need to change the .env file means github is an open platform so anyone can use our link so 
-we need to put the .env file in the .gitignore file so it will not be pushed to github.
+we need to put the .env file in the .gitignore file so it will not be pushed to github
 */
