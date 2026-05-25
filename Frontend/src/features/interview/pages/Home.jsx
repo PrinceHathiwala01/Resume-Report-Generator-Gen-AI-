@@ -9,7 +9,8 @@ const Home = () => {
                   <textarea name="jobDescription" id="jobDescription" placeholder="Enter your job description"></textarea>              
             </div>
             <div className="right">
-                <div className="input-group">
+                    <div className="input-group">
+                        <p className="hightlight"><b>Enter both resume and self description for best results</b></p>
                     <label htmlFor="resume">Upload your Resume</label>
                     <input type="file" name="resume" id="resume" accept=".pdf"/>
                 </div>
