@@ -52,7 +52,7 @@ export const useAuth = () => {
         }
         getAndSetUser();
 
-}, [])
+}, [setLoading, setUser])
 
     return { user, loading, handelLogin, handelRegister, handelLogout };
 }
