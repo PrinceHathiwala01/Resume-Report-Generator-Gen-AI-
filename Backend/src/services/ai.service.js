@@ -59,7 +59,11 @@ async function generateInterviewReport({ resume, jobDescription, selfDescription
 
 }
 
-module.exports = { generateInterviewReport };
+async function generateResumePdf({ resume }) {
+    return Buffer.from(resume || "", "utf-8")
+}
+
+module.exports = { generateInterviewReport, generateResumePdf };
 
 //Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai..
 //Content is the question that you want to ask to the AI inshort it is the prompt   
