@@ -34,6 +34,7 @@ const interviewReportSchema = z.object({
         focus: z.string().describe("The main focus of this day in the preparation plan, e.g. data structure"),
         task: z.array(z.string()).describe("List of tasks to be completed in this day in the preparation plan, e.g. implement a binary search tree")
     })).describe("A day-wise preparation plan for the candidate to prepare for the interview"),
+    title: z.string().describe("The title of the interview report, e.g. Software Engineer Interview Report"),
 });
 
 const interviewReportJsonSchema = z.toJSONSchema(interviewReportSchema);
@@ -58,7 +59,7 @@ async function generateInterviewReport({ resume, jobDescription, selfDescription
 
 }
 
-module.exports = generateInterviewReport;
+module.exports = { generateInterviewReport };
 
 //Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai..
 //Content is the question that you want to ask to the AI inshort it is the prompt   

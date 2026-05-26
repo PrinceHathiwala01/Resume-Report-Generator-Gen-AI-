@@ -6,7 +6,7 @@ const api = axios.create({
 });
 
 export async function getInterviewReport(id) {
-    const response = await api.get(`/api/interview/${id}`);
+    const response = await api.get(`/api/interview/report/${id}`);
     return response.data;
 }
 

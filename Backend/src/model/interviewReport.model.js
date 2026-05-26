@@ -93,8 +93,13 @@ const interviewReportSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User_detail"
-    }
-});
+    },
+    title: {
+        type: String,
+        required: [true, "Title is required"]
+    },
+}, { timestamps: true })
+
 
 const interviewReportModel = mongoose.model("Interview_Report", interviewReportSchema);
 module.exports = interviewReportModel;

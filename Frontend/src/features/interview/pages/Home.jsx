@@ -74,7 +74,7 @@ const Home = () => {
                             value={selfDescription}
                             onChange={(event) => setSelfDescription(event.target.value)}
                         ></textarea>
-                        <p className="highlight"><b>Either Resume or Self description is required</b></p>
+                        
             </div>
                 {error && <p className="form-error">{error}</p>}
                 <button className='generate-button' type="submit" disabled={loading}>
