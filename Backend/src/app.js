@@ -16,4 +16,8 @@ const interviewRouter = require('./routes/interview.routes');
 app.use("/api/auth", authRouter);
 app.use("/api/interview", interviewRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 module.exports =app;
