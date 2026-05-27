@@ -1,6 +1,7 @@
 const dotenv = require("dotenv").config();
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
+const puppeteer = require("puppeteer");
 
 const apiKey =
     process.env.GOOGLE_GENAI_API_KEY ||
@@ -59,11 +60,45 @@ async function generateInterviewReport({ resume, jobDescription, selfDescription
 
 }
 
-async function generateResumePdf({ resume }) {
-    return Buffer.from(resume || "", "utf-8")
+async function generateResumePdf({ resume,selfDescription,jobDescription }) {
+    const resumePdfSchema = z.object({
+        html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
+    })
+
+    const promt = `Generate resume for a candidate with the following details:
+    Resume: ${resume}
+    Job description: ${jobDescription}
+    Self description: ${selfDescription}
+    
+    The format of the response should be in JSON with a single field "html" which contains the HTML content of the resume which can be converted to PDF using any library like puppeteer. The HTML should be well formatted and should contain all the necessary details of the candidate's profile, skills, experience etc. The HTML should be in a format which can be easily converted to PDF using libraries like puppeteer.`
+
+    const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: promt,
+        config: {
+            responseMimeType: "application/json",
+            responseJsonSchema: z.toJSONSchema(resumePdfSchema),
+        }
+    })
+
+    const jsonContent = JSON.parse(response.text)
+    
+    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
+
+    return pdfBuffer
 }
 
-module.exports = { generateInterviewReport, generateResumePdf };
+async function generatePdfFromHtml(htmlContent) { 
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+    const pdfBuffer = await page.pdf({ format: "A4" });
+    await browser.close();
+    return pdfBuffer;
+}
+
+module.exports = { generateInterviewReport, generateResumePdf, generatePdfFromHtml };
 
 //Just import the invokeGeminiAi function and call it in server.js, it will invoke the ai..
 //Content is the question that you want to ask to the AI inshort it is the prompt   
