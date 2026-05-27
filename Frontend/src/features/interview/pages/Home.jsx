@@ -2,10 +2,11 @@ import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
+import InterviewLoader from '../components/InterviewLoader.jsx'
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, loadingMessage, error, generateReport,reports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const resumeInputRef = useRef()
@@ -15,15 +16,13 @@ const Home = () => {
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
         const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        if (data?._id) {
+            navigate(`/interview/${data._id}`)
+        }
     }
 
     if (loading) {
-        return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
-            </main>
-        )
+        return <InterviewLoader message={loadingMessage} />
     }
 
     return (
@@ -34,6 +33,12 @@ const Home = () => {
                 <h1>Create Your Custom <span className='highlight'>Interview Plan</span></h1>
                 <p>Let our AI analyze the job requirements and your unique profile to build a winning strategy.</p>
             </header>
+
+            {error && (
+                <div className='form-alert' role='alert'>
+                    {error}
+                </div>
+            )}
 
             {/* Main Card */}
             <div className='interview-card'>

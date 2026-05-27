@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import '../style/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
+import InterviewLoader from '../components/InterviewLoader.jsx'
 
 
 
@@ -59,7 +60,7 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
-    const { report, getReportById, loading, getResumePdf } = useInterview()
+    const { report, getReportById, loading, loadingMessage, error, getResumePdf } = useInterview()
     const { interviewId } = useParams()
 
     useEffect(() => {
@@ -70,10 +71,17 @@ const Interview = () => {
 
 
 
-    if (loading || !report) {
+    if (loading) {
+        return <InterviewLoader message={loadingMessage} />
+    }
+
+    if (!report) {
         return (
             <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+                <div className='interview-empty-state'>
+                    <h1>Unable to open this interview plan</h1>
+                    <p>{error || "Please try again from your recent interview plans."}</p>
+                </div>
             </main>
         )
     }

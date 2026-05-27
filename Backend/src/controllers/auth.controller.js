@@ -117,14 +117,30 @@ async function logoutUserController(req, res) {
 
 //This controller is used to get the details of the user who is logged in
 async function getMeController(req, res) { 
+    if (!req.user?.id) {
+        return res.status(401).json({
+            message: "User is not authenticated",
+            user: null
+        })
+    }
+
     const user = await userModel.findById(req.user.id);
+
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+            user: null
+        })
+    }
+
     res.status(200).json({
         message: "User details fetched successfully",
         user: {
             id: user._id,
             username: user.username,
             email: user.email
-        }})
+        }
+    })
 }
 module.exports = {
     registerUserController,

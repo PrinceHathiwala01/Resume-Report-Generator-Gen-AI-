@@ -13,54 +13,64 @@ export const useInterview = () => {
         throw new Error("useInterview must be used within an InterviewProvider")
     }
 
-    const { loading, setLoading, report, setReport, reports, setReports } = context
+    const { loading, setLoading, loadingMessage, setLoadingMessage, error, setError, report, setReport, reports, setReports } = context
+
+    const getApiErrorMessage = (error, fallback) => {
+        return error.response?.data?.message || error.message || fallback
+    }
+
+    const startLoading = (message) => {
+        setError("")
+        setLoadingMessage(message)
+        setLoading(true)
+    }
 
     const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
-        setLoading(true)
+        startLoading("Building your custom interview strategy...")
         let response = null
         try {
             response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
             setReport(response.interviewReport)
         } catch (error) {
-            console.log(error)
+            setError(getApiErrorMessage(error, "Unable to generate interview report."))
         } finally {
             setLoading(false)
         }
 
-        return response.interviewReport
+        return response?.interviewReport
     }
 
     const getReportById = async (interviewId) => {
-        setLoading(true)
+        startLoading("Opening your interview plan...")
         let response = null
         try {
             response = await getInterviewReportById(interviewId)
             setReport(response.interviewReport)
         } catch (error) {
-            console.log(error)
+            setError(getApiErrorMessage(error, "Unable to load interview report."))
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
+        return response?.interviewReport
     }
 
     const getReports = async () => {
-        setLoading(true)
+        startLoading("Finding your recent interview plans...")
         let response = null
         try {
             response = await getAllInterviewReports()
             setReports(response.interviewReports)
         } catch (error) {
-            console.log(error)
+            setError(getApiErrorMessage(error, "Unable to load recent interview reports."))
         } finally {
             setLoading(false)
         }
 
-        return response.interviewReports
+        return response?.interviewReports
     }
 
     const getResumePdf = async (interviewReportId) => {
-        setLoading(true)
+        startLoading("Preparing your resume PDF...")
         let response = null
         try {
             response = await generateResumePdf({ interviewReportId })
@@ -72,7 +82,7 @@ export const useInterview = () => {
             link.click()
         }
         catch (error) {
-            console.log(error)
+            setError(getApiErrorMessage(error, "Unable to generate resume PDF."))
         } finally {
             setLoading(false)
         }
@@ -86,6 +96,6 @@ export const useInterview = () => {
         }
     }, [ interviewId ])
 
-    return { loading, report, reports, generateReport, getReportById, getReports, getResumePdf }
+    return { loading, loadingMessage, error, report, reports, generateReport, getReportById, getReports, getResumePdf }
 
 }

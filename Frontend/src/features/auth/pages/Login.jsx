@@ -11,13 +11,20 @@ const Login = () => {
     
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handelSubmit = async (e) => {
         e.preventDefault();
-        const user = await handelLogin({ email, password });
+        setError("");
 
-        if (user) {
-            navigate("/");
+        try {
+            const user = await handelLogin({ email, password });
+
+            if (user) {
+                navigate("/");
+            }
+        } catch (error) {
+            setError(error.response?.data?.message || "Unable to login. Please try again.");
         }
     }
 
@@ -42,6 +49,10 @@ const Login = () => {
     <main>
           <div className='form-container'>
               <h1>Login</h1>
+
+              {error && (
+                  <p className='auth-error' role='alert'>{error}</p>
+              )}
 
               <form onSubmit={handelSubmit}>
                   <div className='input-group'>
