@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import '../style/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useParams } from 'react-router'
@@ -60,14 +60,8 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
-    const { report, getReportById, loading, loadingMessage, error, getResumePdf } = useInterview()
+    const { report, loading, loadingMessage, error, getResumePdf } = useInterview()
     const { interviewId } = useParams()
-
-    useEffect(() => {
-        if (interviewId) {
-            getReportById(interviewId)
-        }
-    }, [ interviewId ])
 
 
 
@@ -140,10 +134,10 @@ const Interview = () => {
                         <section>
                             <div className='content-header'>
                                 <h2>Behavioral Questions</h2>
-                                <span className='content-header__count'>{report.behaviourQuestions.length} questions</span>
+                                <span className='content-header__count'>{report.behavioralQuestions.length} questions</span>
                             </div>
                             <div className='q-list'>
-                                {report.behaviourQuestions.map((q, i) => (
+                                {report.behavioralQuestions.map((q, i) => (
                                     <QuestionCard key={i} item={q} index={i} />
                                 ))}
                             </div>

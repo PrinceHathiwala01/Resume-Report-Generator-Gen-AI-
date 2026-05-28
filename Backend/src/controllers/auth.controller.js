@@ -3,6 +3,14 @@ const tokenBlacklistModel = require("../model/blacklist.model");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER)
+const cookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000
+}
+
 //This controller is used to register new user in the database.
 async function registerUserController(req, res) {
     try {
@@ -46,15 +54,11 @@ async function registerUserController(req, res) {
         )
 
         //This part is used to set the token in the cookie
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 24 * 60 * 60 * 1000
-        });
+        res.cookie("token", token, cookieOptions);
 
         res.status(201).json({
             message: "User registered successfully",
+            token,
             user: {
                 id: user._id,
                 username: user.username,
@@ -63,6 +67,9 @@ async function registerUserController(req, res) {
         })
     } catch (err) {
         console.log("Error in registering user", err);
+        res.status(500).json({
+            message: "Unable to register user"
+        })
     }
 }
 
@@ -97,15 +104,11 @@ async function loginUserController(req, res) {
     { expiresIn: '1d' }
 );
 
-res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000
-});
+res.cookie("token", token, cookieOptions);
 
 res.status(200).json({
     message: "User logged in successfully",
+    token,
     user: {
         id: user._id,
         username: user.username,
@@ -116,14 +119,19 @@ res.status(200).json({
 
 //This controller is used to logout the user by clearing the token from the cookie.
 async function logoutUserController(req, res) {
-    const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : req.cookies.token;
 
     if (token) {
         await tokenBlacklistModel.create({
             token
         })
     }
-    res.clearCookie("token");
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: cookieOptions.secure,
+        sameSite: cookieOptions.sameSite
+    });
     res.status(200).json({
         message: "User logged out successfully"
     })

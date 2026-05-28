@@ -1,6 +1,6 @@
-import {useContext,useEffect} from "react";
+import {useContext} from "react";
 import { AuthContext } from "../auth-state.context";
-import { login,register,logout, getMe } from "../services/auth.api";
+import { login,register,logout } from "../services/auth.api";
 
 export const useAuth = () => {
     const context = useContext(AuthContext)
@@ -32,27 +32,13 @@ export const useAuth = () => {
         setLoading(true);  
         try {
             await logout();
-            setUser(null);
+        } catch (error) {
+            console.log("Logout request failed, clearing local session:", error);
         } finally {
+            setUser(null);
              setLoading(false);
         }  
     }
-
-    useEffect(()=>{
-
-        const getAndSetUser = async () => {
-            try {
-                const data = await getMe()
-                setUser(data.user);
-            } catch {
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        }
-        getAndSetUser();
-
-}, [setLoading, setUser])
 
     return { user, loading, handelLogin, handelRegister, handelLogout };
 }

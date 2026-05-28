@@ -25,11 +25,11 @@ export const useInterview = () => {
         setLoading(true)
     }
 
-    const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
+    const generateReport = async ({ title, jobDescription, selfDescription, resumeFile }) => {
         startLoading("Building your custom interview strategy...")
         let response = null
         try {
-            response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
+            response = await generateInterviewReport({ title, jobDescription, selfDescription, resumeFile })
             setReport(response.interviewReport)
         } catch (error) {
             setError(getApiErrorMessage(error, "Unable to generate interview report."))
@@ -71,9 +71,8 @@ export const useInterview = () => {
 
     const getResumePdf = async (interviewReportId) => {
         startLoading("Preparing your resume PDF...")
-        let response = null
         try {
-            response = await generateResumePdf({ interviewReportId })
+            const response = await generateResumePdf({ interviewReportId })
             const url = window.URL.createObjectURL(new Blob([ response ], { type: "application/pdf" }))
             const link = document.createElement("a")
             link.href = url
@@ -94,6 +93,8 @@ export const useInterview = () => {
         } else {
             getReports()
         }
+        // getReportById/getReports intentionally read the latest context state for this route.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ interviewId ])
 
     return { loading, loadingMessage, error, report, reports, generateReport, getReportById, getReports, getResumePdf }

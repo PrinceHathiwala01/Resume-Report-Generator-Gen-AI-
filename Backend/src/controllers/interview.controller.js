@@ -2,29 +2,46 @@ const pdfParse = require("pdf-parse")
 const { generateInterviewReport, generateResumePdf } = require("../services/ai.service")
 const interviewReportModel = require("../model/interviewReport.model")
 
-
-
-
 /**
  * @description Controller to generate interview report based on user self description, resume and job description.
  */
 async function generateInterViewReportController(req, res) {
 
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
-    const { selfDescription, jobDescription } = req.body
+    const { title, selfDescription, jobDescription } = req.body
+
+    if (!title || !jobDescription) {
+        return res.status(400).json({
+            message: "Job title and job description are required."
+        })
+    }
+
+    if (!req.file && !selfDescription) {
+        return res.status(400).json({
+            message: "Upload a resume or add a self description."
+        })
+    }
+
+    let resumeText = ""
+
+    if (req.file?.buffer) {
+        const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
+        resumeText = resumeContent.text
+    }
 
     const interViewReportByAi = await generateInterviewReport({
-        resume: resumeContent.text,
+        title,
+        resume: resumeText,
         selfDescription,
         jobDescription
     })
 
     const interviewReport = await interviewReportModel.create({
         user: req.user.id,
-        resume: resumeContent.text,
+        resume: resumeText,
         selfDescription,
         jobDescription,
-        ...interViewReportByAi
+        ...interViewReportByAi,
+        title
     })
 
     res.status(201).json({
@@ -75,7 +92,7 @@ async function getAllInterviewReportsController(req, res) {
 async function generateResumePdfController(req, res) {
     const { interviewReportId } = req.params
 
-    const interviewReport = await interviewReportModel.findById(interviewReportId)
+    const interviewReport = await interviewReportModel.findOne({ _id: interviewReportId, user: req.user.id })
 
     if (!interviewReport) {
         return res.status(404).json({
@@ -83,9 +100,9 @@ async function generateResumePdfController(req, res) {
         })
     }
 
-    const { resume, jobDescription, selfDescription } = interviewReport
+    const { title, resume, jobDescription, selfDescription } = interviewReport
 
-    const pdfBuffer = await generateResumePdf({ resume, jobDescription, selfDescription })
+    const pdfBuffer = await generateResumePdf({ title, resume, jobDescription, selfDescription })
 
     res.set({
         "Content-Type": "application/pdf",

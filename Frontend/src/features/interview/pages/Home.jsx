@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
@@ -11,6 +11,7 @@ const Home = () => {
     const [title, setTitle] = useState("")
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
+    const [resumeFile, setResumeFile] = useState(null)
 
     const resumeInputRef = useRef()
 
@@ -18,12 +19,10 @@ const Home = () => {
 
     const handleGenerateReport = async () => {
 
-        const resumeFile = resumeInputRef.current.files[0]
-
         const data = await generateReport({
-            title,
-            jobDescription,
-            selfDescription,
+            title: title.trim(),
+            jobDescription: jobDescription.trim(),
+            selfDescription: selfDescription.trim(),
             resumeFile
         })
 
@@ -161,6 +160,7 @@ const Home = () => {
 
                                 <input
                                     ref={resumeInputRef}
+                                    onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
                                     hidden
                                     type='file'
                                     id='resume'
@@ -227,6 +227,7 @@ const Home = () => {
                     <button
                         onClick={handleGenerateReport}
                         className='generate-btn'
+                        disabled={!title.trim() || !jobDescription.trim() || (!selfDescription.trim() && !resumeFile)}
                     >
 
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

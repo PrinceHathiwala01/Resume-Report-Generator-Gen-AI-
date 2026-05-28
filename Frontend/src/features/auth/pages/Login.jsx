@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import "../auth.form.scss"
-import { useNavigate, Link } from 'react-router'
+import { useNavigate, Link, useLocation } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
 
 const Login = () => {
@@ -8,6 +8,7 @@ const Login = () => {
     const { loading, handelLogin } = useAuth();
 
     const navigate = useNavigate();
+    const location = useLocation();
     
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,7 +22,8 @@ const Login = () => {
             const user = await handelLogin({ email, password });
 
             if (user) {
-                navigate("/");
+                const redirectTo = location.state?.from?.pathname || "/";
+                navigate(redirectTo, { replace: true });
             }
         } catch (error) {
             setError(error.response?.data?.message || "Unable to login. Please try again.");

@@ -1,12 +1,9 @@
+import { Navigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import "../auth.form.scss"
-import { Navigate, useLocation } from "react-router";
-import LogoutButton from "./LogoutButton";
 
-const Protected = ({children}) => {
+const PublicOnly = ({ children }) => {
     const { user, loading } = useAuth();
-    const location = useLocation();
-    
+
     if (loading) {
         return (
             <main>
@@ -24,16 +21,11 @@ const Protected = ({children}) => {
         )
     }
 
-    if (!user) {
-        return <Navigate to="/login" replace state={{ from: location }} />
+    if (user) {
+        return <Navigate to="/" replace />
     }
 
-  return (
-    <>
-        <LogoutButton />
-        {children}
-    </>
-  )
+    return children;
 }
 
-export default Protected
+export default PublicOnly;

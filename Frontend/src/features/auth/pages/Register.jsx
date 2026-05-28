@@ -24,7 +24,7 @@ const Register = () => {
         const user = await handelRegister({ username, email, password });
 
         if (user) {
-          navigate("/");
+          navigate("/", { replace: true });
         }
       } catch (error) {
         setError(error.response?.data?.message || "Unable to register. Please try again.");

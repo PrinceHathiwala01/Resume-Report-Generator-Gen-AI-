@@ -3,7 +3,7 @@ const tokenBlacklistModel = require("../model/blacklist.model");
 
 async function authUser(req, res, next) {
 
-    const token = req.cookies.token;
+    const token = getTokenFromRequest(req);
     if (!token) {
         return res.status(401).json({
             message: "Token not found"
@@ -28,7 +28,7 @@ async function authUser(req, res, next) {
 }
 
 async function optionalAuthUser(req, res, next) {
-    const token = req.cookies.token;
+    const token = getTokenFromRequest(req);
 
     if (!token) {
         return next();
@@ -48,6 +48,16 @@ async function optionalAuthUser(req, res, next) {
     }
 
     next();
+}
+
+function getTokenFromRequest(req) {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader?.startsWith("Bearer ")) {
+        return authHeader.split(" ")[1];
+    }
+
+    return req.cookies.token;
 }
 
 module.exports = {authUser, optionalAuthUser};

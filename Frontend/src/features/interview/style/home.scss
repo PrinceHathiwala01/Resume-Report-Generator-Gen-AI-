@@ -372,6 +372,12 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     &:active {
         transform: scale(0.98);
     }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
 }
 
 .recent-reports{

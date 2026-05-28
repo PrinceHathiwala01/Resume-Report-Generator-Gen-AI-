@@ -1,13 +1,17 @@
 const { GoogleGenAI } = require("@google/genai")
 const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
-const puppeteer = require("puppeteer")
+const chromium = require("@sparticuz/chromium")
+const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER)
+const puppeteer = isProduction
+    ? require("puppeteer-core")
+    : require("puppeteer")
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 })
 
-const geminiModel="gemini-2.5-flash"
+const geminiModel="gemini-2.5-flash-lite"
 
 const interviewReportSchema = z.object({
     matchScore: z.number().describe("A score between 0 and 100 indicating how well the candidate's profile matches the job describe"),
@@ -33,10 +37,11 @@ const interviewReportSchema = z.object({
     title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
-async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+async function generateInterviewReport({ title, resume, selfDescription, jobDescription }) {
 
 
     const prompt = `Generate an interview report for a candidate with the following details:
+                        Job Title: ${title}
                         Resume: ${resume}
                         Self Description: ${selfDescription}
                         Job Description: ${jobDescription}
@@ -59,31 +64,50 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch()
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+    let browser
 
-    const pdfBuffer = await page.pdf({
-        format: "A4", margin: {
-            top: "20mm",
-            bottom: "20mm",
-            left: "15mm",
-            right: "15mm"
+    try {
+        const launchOptions = isProduction
+            ? {
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || await chromium.executablePath(),
+                headless: chromium.headless,
+            }
+            : {
+                headless: "new"
+            }
+
+        browser = await puppeteer.launch(launchOptions)
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+
+        const pdfBuffer = await page.pdf({
+            format: "A4", margin: {
+                top: "20mm",
+                bottom: "20mm",
+                left: "15mm",
+                right: "15mm"
+            },
+            printBackground: true
+        })
+
+        return pdfBuffer
+    } finally {
+        if (browser) {
+            await browser.close()
         }
-    })
-
-    await browser.close()
-
-    return pdfBuffer
+    }
 }
 
-async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+async function generateResumePdf({ title, resume, selfDescription, jobDescription }) {
 
     const resumePdfSchema = z.object({
         html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
     })
 
     const prompt = `Generate resume for a candidate with the following details:
+                        Target Job Title: ${title}
                         Resume: ${resume}
                         Self Description: ${selfDescription}
                         Job Description: ${jobDescription}

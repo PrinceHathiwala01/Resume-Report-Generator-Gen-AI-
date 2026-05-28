@@ -141,6 +141,32 @@ main{
     }
 }
 
+.logout-button {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.5rem;
+    background: #161b22;
+    color: #e6edf3;
+    padding: 0.65rem 1rem;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+
+    &:hover {
+        background: #1c2230;
+        border-color: rgba(255, 45, 120, 0.5);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
 @keyframes auth-spin{
     to{
         transform: rotate(360deg);
