@@ -2,7 +2,6 @@ const dotenv = require("dotenv").config();
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const puppeteer = require("puppeteer");
-const chromium = require("@sparticuz/chromium");
 
 const apiKey =
     process.env.GOOGLE_GENAI_API_KEY ||
@@ -100,10 +99,7 @@ async function generateResumePdf({ resume,selfDescription,jobDescription }) {
 
 async function generatePdfFromHtml(htmlContent) { 
     const browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath,
-        headless: true,
+        headless: "new",
     });
 
     const page = await browser.newPage();
