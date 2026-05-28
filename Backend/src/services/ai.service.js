@@ -1,7 +1,7 @@
 const dotenv = require("dotenv").config();
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 
 const apiKey =
     process.env.GOOGLE_GENAI_API_KEY ||
