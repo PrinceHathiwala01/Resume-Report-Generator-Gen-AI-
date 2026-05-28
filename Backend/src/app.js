@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 
 app.use(cors({
-    origin: "https://resume-report-generator.vercel.app/",
+    origin: "https://resume-report-generator.vercel.app",
     credentials: true
 }));
 app.use(express.json());
