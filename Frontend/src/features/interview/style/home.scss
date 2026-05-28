@@ -32,6 +32,34 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     gap: 2rem;
 }
 
+
+.title-section {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.panel__input {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background-color: $bg-input;
+    color: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+
+    &:focus {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.05);
+    }
+
+    &::placeholder {
+        color: rgba(255,255,255,0.45);
+    }
+}
 // ── Page Header ──────────────────────────────────────────────────────────────
 .page-header {
     text-align: center;
@@ -190,6 +218,13 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         background-color: rgba($badge-required, 0.15);
         color: $badge-required;
         border: 1px solid rgba($badge-required, 0.3);
+    }
+
+    &--required1 {
+        background-color: rgba($badge-required, 0.15);
+        color: $badge-required;
+        border: 1px solid rgba($badge-required, 0.3);
+        margin-left: 16rem;
     }
 
     &--best {
