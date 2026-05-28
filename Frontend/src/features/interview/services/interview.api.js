@@ -1,9 +1,14 @@
 import axios from "axios";
 
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3000"
+    : "https://gen-ai-mg6q.onrender.com";
+
 const api = axios.create({
-    baseURL: "https://gen-ai-mg6q.onrender.com",
-    withCredentials: true,
-})
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
 
 
 /**

@@ -3,8 +3,12 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const cors = require('cors');
 
+const multipleOrigin = [
+    "https://resume-report-generator.vercel.app",
+    "http://localhost:5173"
+]
 app.use(cors({
-    origin: "https://resume-report-generator.vercel.app",
+    origin: multipleOrigin,
     credentials: true
 }));
 app.use(express.json());

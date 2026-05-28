@@ -1,13 +1,14 @@
 import axios from "axios";
 
-//This variable is used to remove the repeatative code from the api caller
-//Basically it will set the baseURL and credential flag true for all the api caller
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3000"
+    : "https://gen-ai-mg6q.onrender.com";
+
 const api = axios.create({
-    baseURL: "https://gen-ai-mg6q.onrender.com/",
-    // "withcredentials" is used when we want to send the cookie with the request
-            //In short it allows the server to access and set the cookie on its own
-    withCredentials: true
-})
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
 
 //This api caller is used to register the user via frontend of the website
 export async function register({ username, email, password }) {
