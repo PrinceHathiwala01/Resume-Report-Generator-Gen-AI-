@@ -3,7 +3,7 @@ import axios from "axios";
 //This variable is used to remove the repeatative code from the api caller
 //Basically it will set the baseURL and credential flag true for all the api caller
 const api = axios.create({
-    baseURL: "http://localhost:3000/",
+    baseURL: "https://gen-ai-mg6q.onrender.com/",
     // "withcredentials" is used when we want to send the cookie with the request
             //In short it allows the server to access and set the cookie on its own
     withCredentials: true
