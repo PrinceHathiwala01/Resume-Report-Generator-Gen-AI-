@@ -131,16 +131,12 @@ async function generatePdfFromHtml(htmlContent) {
   let browser;
 
   try {
-    const executablePath =
-      await chromium.executablePath?.() ||
-      (typeof chromium.executablePath === "string"
-        ? chromium.executablePath
-        : undefined);
+    const executablePath = await chromium.executablePath();
 
     browser = await puppeteer.launch({
       args: chromium.args,
       executablePath,
-      headless: chromium.headless || true,
+      headless: chromium.headless,
     });
 
     const page = await browser.newPage();
