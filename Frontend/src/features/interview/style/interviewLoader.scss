@@ -15,166 +15,150 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
     display: grid;
     place-items: center;
     padding: 1.5rem;
-    background:
-        radial-gradient(circle at 20% 20%, rgba($accent, 0.14), transparent 30%),
-        radial-gradient(circle at 80% 75%, rgba($accent-cyan, 0.14), transparent 28%),
-        $bg-page;
+    background: $bg-page;
     color: $text-primary;
     font-family: $font-stack;
-    overflow: hidden;
 }
 
 .interview-loader {
-    width: min(100%, 480px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.15rem;
-    padding: 2rem;
+    width: min(100%, 430px);
+    padding: 1.5rem;
     border: 1px solid rgba($border-color, 0.9);
-    border-radius: 0.75rem;
-    background: linear-gradient(180deg, rgba($bg-card, 0.96), rgba($bg-panel, 0.9));
-    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34), 0 0 55px rgba($accent, 0.12);
-    text-align: center;
+    border-radius: 0.5rem;
+    background: $bg-card;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 
-    &__orb {
-        width: 8.5rem;
-        aspect-ratio: 1;
-        position: relative;
-        display: grid;
-        place-items: center;
-    }
+    &__sheet {
+        width: 100%;
+        min-height: 8rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1.35rem;
+        padding: 1rem;
+        border: 1px solid rgba($border-color, 0.85);
+        border-radius: 0.45rem;
+        background: $bg-panel;
 
-    &__ring {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 2px solid transparent;
+        span {
+            display: block;
+            height: 0.65rem;
+            border-radius: 999px;
+            background: rgba($text-muted, 0.2);
+            overflow: hidden;
+            position: relative;
 
-        &--outer {
-            border-top-color: $accent;
-            border-right-color: rgba($accent, 0.5);
-            animation: interview-spin 1.15s linear infinite;
-            box-shadow: 0 0 26px rgba($accent, 0.28);
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                width: 44%;
+                border-radius: inherit;
+                background: rgba($text-primary, 0.42);
+                animation: interview-line 1.55s ease-in-out infinite;
+            }
+
+            &:nth-child(1) {
+                width: 82%;
+            }
+
+            &:nth-child(2) {
+                width: 94%;
+
+                &::after {
+                    animation-delay: 0.14s;
+                }
+            }
+
+            &:nth-child(3) {
+                width: 68%;
+
+                &::after {
+                    animation-delay: 0.28s;
+                }
+            }
+
+            &:nth-child(4) {
+                width: 76%;
+
+                &::after {
+                    animation-delay: 0.42s;
+                }
+            }
         }
-
-        &--middle {
-            inset: 1rem;
-            border-left-color: $accent-cyan;
-            border-bottom-color: rgba($accent-cyan, 0.55);
-            animation: interview-spin 1.45s linear infinite reverse;
-        }
-    }
-
-    &__spark {
-        position: absolute;
-        width: 0.55rem;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: $accent-green;
-        box-shadow: 0 0 16px rgba($accent-green, 0.7);
-        animation: interview-pulse 1.2s ease-in-out infinite;
-
-        &--one {
-            top: 0.85rem;
-            right: 1.15rem;
-        }
-
-        &--two {
-            bottom: 1rem;
-            left: 1rem;
-            background: $accent-cyan;
-            box-shadow: 0 0 16px rgba($accent-cyan, 0.7);
-            animation-delay: 0.18s;
-        }
-
-        &--three {
-            right: 0.25rem;
-            bottom: 2.7rem;
-            background: $accent;
-            box-shadow: 0 0 16px rgba($accent, 0.7);
-            animation-delay: 0.36s;
-        }
-    }
-
-    svg {
-        width: 4rem;
-        height: 4rem;
-        fill: $accent;
-        filter: drop-shadow(0 0 18px rgba($accent, 0.5));
-        animation: interview-float 1.8s ease-in-out infinite;
     }
 
     &__copy {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 0.55rem;
+        gap: 0.45rem;
+        margin-bottom: 1.15rem;
 
         h1 {
-            max-width: 13ch;
             margin: 0;
             color: $text-primary;
-            font-size: clamp(1.75rem, 5vw, 2.35rem);
-            line-height: 1.05;
-            font-weight: 800;
+            font-size: clamp(1.35rem, 4vw, 1.7rem);
+            line-height: 1.2;
+            font-weight: 700;
         }
 
         p {
-            max-width: 34rem;
             margin: 0;
             color: $text-muted;
-            font-size: 0.95rem;
+            font-size: 0.94rem;
             line-height: 1.55;
             cursor: default;
         }
     }
 
-    &__eyebrow {
-        color: $accent-cyan !important;
-        font-size: 0.75rem !important;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
-
     &__bar {
         width: 100%;
-        height: 0.55rem;
+        height: 0.45rem;
         overflow: hidden;
         border-radius: 999px;
-        background: rgba($bg-page, 0.75);
+        background: rgba($bg-page, 0.85);
         border: 1px solid rgba($border-color, 0.95);
 
         span {
             display: block;
-            width: 45%;
+            width: 42%;
             height: 100%;
             border-radius: inherit;
-            background: linear-gradient(90deg, $accent, $accent-cyan, $accent-green);
-            animation: interview-load 1.5s ease-in-out infinite;
+            background: $accent;
+            animation: interview-load 1.45s ease-in-out infinite;
         }
     }
 
     &__steps {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
+        gap: 0.55rem;
+        margin-top: 1rem;
 
         span {
-            min-height: 2.4rem;
-            display: grid;
-            place-items: center;
-            padding: 0.45rem 0.55rem;
+            min-height: 2.45rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.7rem;
             border: 1px solid rgba($border-color, 0.85);
-            border-radius: 0.5rem;
+            border-radius: 0.4rem;
             color: $text-muted;
-            background: rgba($bg-page, 0.32);
-            font-size: 0.74rem;
-            font-weight: 700;
+            background: rgba($bg-page, 0.28);
+            font-size: 0.82rem;
+            font-weight: 650;
             line-height: 1.25;
-            animation: interview-step 1.8s ease-in-out infinite;
+            animation: interview-step 2.1s ease-in-out infinite;
+
+            &::before {
+                content: '';
+                width: 0.55rem;
+                height: 0.55rem;
+                flex: 0 0 auto;
+                border-radius: 50%;
+                background: rgba($text-muted, 0.45);
+            }
 
             &:nth-child(2) {
                 animation-delay: 0.2s;
@@ -212,22 +196,17 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
     }
 }
 
-@keyframes interview-spin {
-    to {
-        transform: rotate(360deg);
+@keyframes interview-line {
+    0% {
+        transform: translateX(-115%);
     }
-}
 
-@keyframes interview-float {
-    50% {
-        transform: translateY(-0.35rem) scale(1.04);
+    55% {
+        transform: translateX(70%);
     }
-}
 
-@keyframes interview-pulse {
-    50% {
-        transform: scale(1.6);
-        opacity: 0.55;
+    100% {
+        transform: translateX(235%);
     }
 }
 
@@ -237,7 +216,7 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
     }
 
     50% {
-        transform: translateX(70%);
+        transform: translateX(72%);
     }
 
     100% {
@@ -254,20 +233,16 @@ $font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, s
 
     50% {
         color: $text-primary;
-        border-color: rgba($accent-cyan, 0.48);
+        border-color: rgba($accent-cyan, 0.4);
     }
 }
 
 @media (max-width: 560px) {
     .interview-loader {
-        padding: 1.5rem;
+        padding: 1.15rem;
 
-        &__orb {
-            width: 7rem;
-        }
-
-        &__steps {
-            grid-template-columns: 1fr;
+        &__sheet {
+            min-height: 7rem;
         }
     }
 }
