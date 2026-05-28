@@ -89,6 +89,10 @@ async function generateResumePdf({ resume,selfDescription,jobDescription }) {
 
     const jsonContent = JSON.parse(response.text)
     
+    if (!jsonContent.html || typeof jsonContent.html !== 'string') {
+        throw new Error("Invalid HTML content received from AI model")
+    }
+
     const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
     return pdfBuffer
