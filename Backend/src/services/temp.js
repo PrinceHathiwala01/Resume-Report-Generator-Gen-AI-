@@ -3,13 +3,13 @@ Prince Hathiwala
 Gujrat, India
 princehathiwala76@gmail.com
 +91 1234567890
-https://github.com/PrinceHathiwala
-https://www.linkedin.com/in/princehathiwala/
+https://github.com/PrinceHathiwala01
+https://www.linkedin.com/in/prince-hathiwala
 
 Professional Summary
 MERN Stack Developer with a passion for building dynamic and user-friendly web applications.
 
-Technical Skille
+Technical Skills
 Languages: JavaScript, HTML, CSS
 Frontend Frameworks: React, Angular
 Backend Frameworks: Node.js, Express.js
