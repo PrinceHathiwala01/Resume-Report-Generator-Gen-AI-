@@ -179,20 +179,44 @@ async function generatePdfFromHtml(htmlContent) {
     let browser
 
     try {
-        const launchOptions = isProduction
-            ? {
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || await chromium.executablePath(),
-                headless: chromium.headless,
+        let launchOptions = {}
+
+        if (isProduction) {
+            try {
+                const execPath = await chromium.executablePath()
+                launchOptions = {
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: execPath,
+                    headless: chromium.headless,
+                }
+            } catch (error) {
+                console.error("Failed to get chromium path, using fallback:", error.message)
+                launchOptions = {
+                    args: [
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--single-process"
+                    ],
+                    headless: true,
+                }
             }
-            : {
+        } else {
+            launchOptions = {
                 headless: "new"
             }
+        }
 
         browser = await puppeteer.launch(launchOptions)
         const page = await browser.newPage();
-        await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+        
+        // Set default navigation timeout
+        page.setDefaultNavigationTimeout(30000)
+        page.setDefaultTimeout(30000)
+        
+        await page.setContent(htmlContent, { waitUntil: "networkidle2" })
 
         const pdfBuffer = await page.pdf({
             format: "A4", margin: {
@@ -205,6 +229,9 @@ async function generatePdfFromHtml(htmlContent) {
         })
 
         return pdfBuffer
+    } catch (error) {
+        console.error("PDF generation error:", error)
+        throw new Error(`Failed to generate PDF: ${error.message}`)
     } finally {
         if (browser) {
             await browser.close()
@@ -239,21 +266,29 @@ async function generateResumePdf({ title, resume, selfDescription, jobDescriptio
                         The resume should not be lengthy then 1-1.5 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
                     `
 
-    const response = await ai.models.generateContent({
-        model: geminiModel,
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: resumePdfSchema,
+    try {
+        const response = await ai.models.generateContent({
+            model: geminiModel,
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: resumePdfSchema,
+            }
+        })              
+
+        const jsonContent = JSON.parse(response.text)
+
+        if (!jsonContent.html) {
+            throw new Error("AI response does not contain HTML content")
         }
-    })              
 
+        const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
-    const jsonContent = JSON.parse(response.text)
-
-    const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
-
-    return pdfBuffer
+        return pdfBuffer
+    } catch (error) {
+        console.error("Resume PDF generation failed:", error)
+        throw error
+    }
 
 }
 
