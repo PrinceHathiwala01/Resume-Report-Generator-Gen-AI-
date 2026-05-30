@@ -1,9 +1,7 @@
 const { GoogleGenAI, Type } = require("@google/genai")
 const chromium = require("@sparticuz/chromium")
 const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER)
-const puppeteer = isProduction
-    ? require("puppeteer-core")
-    : require("puppeteer")
+const puppeteer = require("puppeteer")
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -179,35 +177,20 @@ async function generatePdfFromHtml(htmlContent) {
     let browser
 
     try {
-        let launchOptions = {}
-
-        if (isProduction) {
-            try {
-                const execPath = await chromium.executablePath()
-                launchOptions = {
-                    args: chromium.args,
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: execPath,
-                    headless: chromium.headless,
-                }
-            } catch (error) {
-                console.error("Failed to get chromium path, using fallback:", error.message)
-                launchOptions = {
-                    args: [
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--disable-dev-shm-usage",
-                        "--disable-gpu",
-                        "--single-process"
-                    ],
-                    headless: true,
-                }
+        const launchOptions = isProduction
+            ? {
+                args: [
+                    ...chromium.args,
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage"
+                ],
+                defaultViewport: chromium.defaultViewport,
+                headless: chromium.headless,
             }
-        } else {
-            launchOptions = {
+            : {
                 headless: "new"
             }
-        }
 
         browser = await puppeteer.launch(launchOptions)
         const page = await browser.newPage();
