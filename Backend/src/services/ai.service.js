@@ -1,7 +1,5 @@
 const { GoogleGenAI, Type } = require("@google/genai")
-const chromium = require("@sparticuz/chromium")
-// Check for Render, production, or other hosting environments
-const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER) || Boolean(process.env.RAILWAY_ENVIRONMENT_NAME)
+const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER)
 const isRender = Boolean(process.env.RENDER)
 const puppeteer = require("puppeteer")
 
@@ -185,32 +183,17 @@ async function generatePdfFromHtml(htmlContent) {
         let launchOptions = {}
         
         if (isRender) {
-            console.log("🎯 Using Render-optimized Puppeteer settings...")
-            try {
-                // On Render, use sparticuz chromium with proper API
-                launchOptions = {
-                    args: [
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--disable-dev-shm-usage",
-                        "--disable-gpu",
-                        "--disable-extensions",
-                    ],
-                    headless: true,
-                    executablePath: await chromium.executablePath(),
-                }
-            } catch (pathError) {
-                console.warn("⚠️ Chromium path error, using puppeteer default:", pathError.message)
-                // Fallback to puppeteer's bundled chromium
-                launchOptions = {
-                    headless: true,
-                    args: [
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--disable-dev-shm-usage",
-                        "--disable-gpu",
-                    ]
-                }
+            console.log("🎯 Using Render-optimized Puppeteer settings (no executable path)...")
+            // On Render, don't specify executablePath - let puppeteer use its bundled chromium
+            launchOptions = {
+                headless: true,
+                args: [
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-extensions",
+                ]
             }
         } else if (isProduction) {
             console.log("🎯 Using production Puppeteer settings...")
