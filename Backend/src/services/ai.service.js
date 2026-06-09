@@ -187,47 +187,40 @@ async function generatePdfFromHtml(htmlContent) {
         if (isRender) {
             console.log("🎯 Using Render-optimized Puppeteer settings...")
             try {
-                const execPath = await chromium.executablePath()
+                // On Render, use sparticuz chromium with proper API
                 launchOptions = {
                     args: [
-                        ...chromium.args,
                         "--no-sandbox",
                         "--disable-setuid-sandbox",
                         "--disable-dev-shm-usage",
                         "--disable-gpu",
                         "--disable-extensions",
-                        "--single-process"
                     ],
-                    defaultViewport: chromium.defaultViewport,
-                    headless: chromium.headless,
-                    executablePath: execPath,
+                    headless: true,
+                    executablePath: await chromium.executablePath(),
                 }
             } catch (pathError) {
-                console.warn("⚠️ Could not get chromium path, using default launch:", pathError.message)
+                console.warn("⚠️ Chromium path error, using puppeteer default:", pathError.message)
+                // Fallback to puppeteer's bundled chromium
                 launchOptions = {
+                    headless: true,
                     args: [
-                        ...chromium.args,
                         "--no-sandbox",
                         "--disable-setuid-sandbox",
                         "--disable-dev-shm-usage",
                         "--disable-gpu",
-                        "--disable-extensions",
-                    ],
-                    defaultViewport: chromium.defaultViewport,
-                    headless: chromium.headless,
+                    ]
                 }
             }
         } else if (isProduction) {
             console.log("🎯 Using production Puppeteer settings...")
             launchOptions = {
+                headless: true,
                 args: [
-                    ...chromium.args,
                     "--no-sandbox",
                     "--disable-setuid-sandbox",
                     "--disable-dev-shm-usage"
                 ],
-                defaultViewport: chromium.defaultViewport,
-                headless: chromium.headless,
             }
         } else {
             console.log("🎯 Using development Puppeteer settings...")
