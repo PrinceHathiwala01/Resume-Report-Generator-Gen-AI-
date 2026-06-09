@@ -1,6 +1,8 @@
 const { GoogleGenAI, Type } = require("@google/genai")
 const chromium = require("@sparticuz/chromium")
-const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER)
+// Check for Render, production, or other hosting environments
+const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.RENDER) || Boolean(process.env.RAILWAY_ENVIRONMENT_NAME)
+const isRender = Boolean(process.env.RENDER)
 const puppeteer = require("puppeteer")
 
 const ai = new GoogleGenAI({
@@ -177,8 +179,30 @@ async function generatePdfFromHtml(htmlContent) {
     let browser
 
     try {
-        const launchOptions = isProduction
-            ? {
+        console.log("🔄 Starting PDF generation from HTML...")
+        console.log("Environment:", isRender ? "Render" : isProduction ? "Production" : "Development")
+        
+        let launchOptions = {}
+        
+        if (isRender) {
+            console.log("🎯 Using Render-optimized Puppeteer settings...")
+            launchOptions = {
+                args: [
+                    ...chromium.args,
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-extensions",
+                    "--single-process"
+                ],
+                defaultViewport: chromium.defaultViewport,
+                headless: chromium.headless,
+                executablePath: await chromium.executablePath(),
+            }
+        } else if (isProduction) {
+            console.log("🎯 Using production Puppeteer settings...")
+            launchOptions = {
                 args: [
                     ...chromium.args,
                     "--no-sandbox",
@@ -188,21 +212,35 @@ async function generatePdfFromHtml(htmlContent) {
                 defaultViewport: chromium.defaultViewport,
                 headless: chromium.headless,
             }
-            : {
-                headless: "new"
+        } else {
+            console.log("🎯 Using development Puppeteer settings...")
+            launchOptions = {
+                headless: "new",
+                args: ["--no-sandbox"]
             }
+        }
 
+        console.log("🚀 Launching Puppeteer browser...")
         browser = await puppeteer.launch(launchOptions)
         const page = await browser.newPage();
         
         // Set default navigation timeout
-        page.setDefaultNavigationTimeout(30000)
-        page.setDefaultTimeout(30000)
+        page.setDefaultNavigationTimeout(60000)
+        page.setDefaultTimeout(60000)
         
-        await page.setContent(htmlContent, { waitUntil: "networkidle2" })
+        console.log("📄 Setting page content...")
+        try {
+            await page.setContent(htmlContent, { waitUntil: "networkidle2" })
+        } catch (contentError) {
+            console.warn("⚠️ networkidle2 timeout, retrying with domcontentloaded...")
+            // Fallback to domcontentloaded if networkidle2 times out
+            await page.setContent(htmlContent, { waitUntil: "domcontentloaded" })
+        }
 
+        console.log("📑 Generating PDF from page...")
         const pdfBuffer = await page.pdf({
-            format: "A4", margin: {
+            format: "A4", 
+            margin: {
                 top: "20mm",
                 bottom: "20mm",
                 left: "15mm",
@@ -211,13 +249,20 @@ async function generatePdfFromHtml(htmlContent) {
             printBackground: true
         })
 
+        console.log("✅ PDF generated successfully! Size:", pdfBuffer.length, "bytes")
         return pdfBuffer
     } catch (error) {
-        console.error("PDF generation error:", error)
+        console.error("❌ PDF generation error:", error.message)
+        console.error("Stack trace:", error.stack)
         throw new Error(`Failed to generate PDF: ${error.message}`)
     } finally {
         if (browser) {
-            await browser.close()
+            console.log("🔒 Closing browser...")
+            try {
+                await browser.close()
+            } catch (closeError) {
+                console.warn("⚠️ Error closing browser:", closeError.message)
+            }
         }
     }
 }
@@ -250,6 +295,7 @@ async function generateResumePdf({ title, resume, selfDescription, jobDescriptio
                     `
 
     try {
+        console.log("🤖 Requesting resume HTML from Gemini AI...")
         const response = await ai.models.generateContent({
             model: geminiModel,
             contents: prompt,
@@ -259,17 +305,26 @@ async function generateResumePdf({ title, resume, selfDescription, jobDescriptio
             }
         })              
 
+        console.log("📝 Parsing AI response...")
         const jsonContent = JSON.parse(response.text)
 
         if (!jsonContent.html) {
             throw new Error("AI response does not contain HTML content")
         }
 
+        if (!jsonContent.html.includes("<html") && !jsonContent.html.includes("<body")) {
+            throw new Error("AI response HTML is invalid or incomplete")
+        }
+
+        console.log("✓ HTML received from AI, length:", jsonContent.html.length, "characters")
+        
+        // Clean up large resume/description text after AI generation to save memory
         const pdfBuffer = await generatePdfFromHtml(jsonContent.html)
 
         return pdfBuffer
     } catch (error) {
-        console.error("Resume PDF generation failed:", error)
+        console.error("❌ Resume PDF generation failed:", error.message)
+        console.error("Stack:", error.stack)
         throw error
     }
 
