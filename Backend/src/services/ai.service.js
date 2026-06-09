@@ -186,19 +186,36 @@ async function generatePdfFromHtml(htmlContent) {
         
         if (isRender) {
             console.log("🎯 Using Render-optimized Puppeteer settings...")
-            launchOptions = {
-                args: [
-                    ...chromium.args,
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--disable-extensions",
-                    "--single-process"
-                ],
-                defaultViewport: chromium.defaultViewport,
-                headless: chromium.headless,
-                executablePath: await chromium.executablePath(),
+            try {
+                const execPath = await chromium.executablePath()
+                launchOptions = {
+                    args: [
+                        ...chromium.args,
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--disable-extensions",
+                        "--single-process"
+                    ],
+                    defaultViewport: chromium.defaultViewport,
+                    headless: chromium.headless,
+                    executablePath: execPath,
+                }
+            } catch (pathError) {
+                console.warn("⚠️ Could not get chromium path, using default launch:", pathError.message)
+                launchOptions = {
+                    args: [
+                        ...chromium.args,
+                        "--no-sandbox",
+                        "--disable-setuid-sandbox",
+                        "--disable-dev-shm-usage",
+                        "--disable-gpu",
+                        "--disable-extensions",
+                    ],
+                    defaultViewport: chromium.defaultViewport,
+                    headless: chromium.headless,
+                }
             }
         } else if (isProduction) {
             console.log("🎯 Using production Puppeteer settings...")
