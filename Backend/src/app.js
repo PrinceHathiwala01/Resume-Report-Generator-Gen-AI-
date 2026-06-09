@@ -15,6 +15,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`📨 [${req.method}] ${req.path}`);
+    next();
+});
+
 const authRouter = require('./routes/auth.routes');
 const interviewRouter = require('./routes/interview.routes');
 
@@ -43,6 +49,16 @@ app.get("/debug/users", async (req, res) => {
       error: err.message
     });
   }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error("❌ Unhandled error:", err.message);
+    console.error("Stack:", err.stack);
+    res.status(500).json({
+        message: "Internal server error",
+        error: process.env.NODE_ENV === "production" ? "Internal server error" : err.message
+    });
 });
 
 module.exports =app;
