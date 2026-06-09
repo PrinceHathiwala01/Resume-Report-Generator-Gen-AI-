@@ -124,9 +124,11 @@ async function loginUserController(req, res) {
         },
     });
     } catch (err) {
-        console.log("Error in logging in user", err);
+        console.error("❌ Error in logging in user:", err.message);
+        console.error("Stack:", err.stack);
         res.status(500).json({
-            message: "Unable to login user"
+            message: "Unable to login user",
+            error: err.message
         })
     }
 }

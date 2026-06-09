@@ -29,4 +29,20 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Debug endpoint to check users in database
+app.get("/debug/users", async (req, res) => {
+  try {
+    const userModel = require('./model/user.model');
+    const users = await userModel.find({}, { email: 1, username: 1, _id: 1 });
+    res.status(200).json({
+      count: users.length,
+      users: users
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
+
 module.exports =app;
