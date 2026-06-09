@@ -75,46 +75,60 @@ async function registerUserController(req, res) {
 
 //This controller is used to login the user and provide them with a token for authentication.
 async function loginUserController(req, res) {
-    const { email, password } = req.body;
-    
-    //This is to check whether user exists or not
-    const user = await userModel.findOne({ email });
+    try {
+        const { email, password } = req.body;
+        
+        //This is to check if all the fields are filled or not
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required"
+            })
+        }
+        
+        //This is to check whether user exists or not
+        const user = await userModel.findOne({ email });
 
-    if (!user) {
-        return res.status(400).json({
-            message:"Invalid Credentials, User not found"
+        if (!user) {
+            return res.status(400).json({
+                message:"Invalid Credentials, User not found"
+            })
+        }
+
+        //This is to check whether the password is correct or not
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) { 
+            return res.status(400).json({
+                message: "Invalid Credentials, Wrong Password"
+            })
+        }
+
+        //This is to create a token for the user
+        const token = jwt.sign(
+        {
+            id: user._id,
+            username: user.username
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+    );
+
+    res.cookie("token", token, cookieOptions);
+
+    res.status(200).json({
+        message: "User logged in successfully",
+        token,
+        user: {
+            id: user._id,
+            username: user.username,
+            email: user.email
+        },
+    });
+    } catch (err) {
+        console.log("Error in logging in user", err);
+        res.status(500).json({
+            message: "Unable to login user"
         })
     }
-
-    //This is to check whether the password is correct or not
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) { 
-        return res.status(400).json({
-            message: "Invalid Credentials, Wrong Password"
-        })
-    }
-
-    //This is to create a token for the user
-    const token = jwt.sign(
-    {
-        id: user._id,
-        username: user.username
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-);
-
-res.cookie("token", token, cookieOptions);
-
-res.status(200).json({
-    message: "User logged in successfully",
-    token,
-    user: {
-        id: user._id,
-        username: user.username,
-        email: user.email
-    },
-});
 }
 
 //This controller is used to logout the user by clearing the token from the cookie.

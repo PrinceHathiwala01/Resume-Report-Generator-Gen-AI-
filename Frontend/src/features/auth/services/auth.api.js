@@ -3,8 +3,8 @@ import axios from "axios";
 const TOKEN_KEY = "authToken";
 
 const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:3000"
+    import.meta.env.MODE === "development" ?
+        "http://localhost:3000"
     : "https://gen-ai-mg6q.onrender.com";
 
 const api = axios.create({
