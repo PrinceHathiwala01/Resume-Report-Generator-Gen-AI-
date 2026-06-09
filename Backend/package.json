@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx nodemon server.js",
-    "start": "node server.js",
-    "postinstall": "node -e \"if(process.env.RENDER) { require('child_process').execSync('npx puppeteer browsers install chrome', {stdio: 'inherit'}); }\""
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
